@@ -1,16 +1,15 @@
-# This is a sample Python script.
+"""
+Phase 1: Data Visualization
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+This data is information about the shows and movies streaming in the USA.
+The intention here is to find out how Netflix content is being consumed by the audience.
+"""
 
+import numpy as np  # to perform linear algebra
+import pandas as pd  # to perform data and file processing
+import matplotlib.pyplot as plt # for plotting data
+import seaborn as sns # for visualizing data
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+# Import files into DataFrames
+titles_data = pd.read_csv('Dataset/titles.csv')
+credits_data = pd.read_csv('Dataset/credits.csv')
