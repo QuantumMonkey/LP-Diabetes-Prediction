@@ -78,3 +78,22 @@ print("\nTypes of content with count:\n", type_count.head())
 type_count.plot(kind='pie', figsize=(10, 5), autopct='%1.1f%%')  # Plot Pie Chart
 plt.title('Type Distribution')  # Title
 plt.show()
+
+# Highly voted content
+
+top10_tmdb_rating = titles_data.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
+    ['title', 'tmdb_score', 'tmdb_popularity', 'type']].head(10)
+plt.title('Top 10 based on tmdb votes')
+print("Top 10 movies/shows based on ratings:\n", top10_tmdb_rating)
+
+top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_score', figsize=(9, 6), color='green')
+plt.xlabel('tmdb_popularity')
+plt.ylabel('Title')
+plt.show()
+
+# Merging data for top actors and directors
+titles_data = titles_data.merge(credits_data, how='outer', on='id')
+
+# Filtering Directors and Actors
+director = titles_data[titles_data['role'] == 'director']
+actor = titles_data[titles_data['role'] == 'actor']
