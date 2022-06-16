@@ -47,11 +47,12 @@ credits_data.dropna(axis=0, how='any', inplace=True)
 print("Null values in columns:\n", credits_data.isnull().sum(), '\n')  # Display number of null values in columns
 print("Dimensions: ", credits_data.shape, '\n')  # Data Structure
 
-# Exploratory Data Analysis - time to plot some insights
+"""
+Exploratory Data Analysis - time to plot some insights
+"""
 
 # Top 10 Countries to produce content
 top10_production_countries = titles_data.production_countries.value_counts().head(10)
-# plot1 = plt.figure(1)
 
 top10_production_countries.plot(kind='bar', width=0.8, figsize=(9, 6), color='r')  # plot a bar graph
 plt.title('Top 10 countries with highest production')  # Title
@@ -62,7 +63,6 @@ plt.show()
 # Content production per year
 year_count = titles_data.release_year.value_counts()
 print("Content produced in the last 10 years:\n", year_count.head(10))
-# plot2 = plt.figure(2)
 
 sns.lineplot(data=year_count)  # Feed data to seaborn graph
 plt.title('Total shows/movies released over the years')  # Title
@@ -72,10 +72,9 @@ plt.ylabel('total')  # Y-axis label
 plt.show()
 
 # Types of content on Netflix
-type_count = titles_data.type.value_count()
-print("Types of content with count:\n", type_count.head())
-# plot3 = plt.figure(3)
+type_count = titles_data.type.value_counts()
+print("\nTypes of content with count:\n", type_count.head())
 
-type_count.plot('pie', figsize=(10, 5), autopct='%1.1f%%')  # Plot Pie Chart
+type_count.plot(kind='pie', figsize=(10, 5), autopct='%1.1f%%')  # Plot Pie Chart
 plt.title('Type Distribution')  # Title
 plt.show()
