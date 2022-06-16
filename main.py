@@ -86,9 +86,9 @@ top10_tmdb_rating = titles_data.sort_values(['tmdb_score', 'tmdb_popularity'], a
 plt.title('Top 10 based on tmdb votes')
 print("Top 10 movies/shows based on ratings:\n", top10_tmdb_rating)
 
-top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_score', figsize=(9, 6), color='green')
-plt.xlabel('tmdb_popularity')
-plt.ylabel('Title')
+top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_score', figsize=(9, 6), color='green') #Plot Horizontal Bargraph
+plt.xlabel('tmdb_popularity')  # X-axis label
+plt.ylabel('Title')  # Y-axis label
 plt.show()
 
 # Merging data for top actors and directors
@@ -97,3 +97,24 @@ titles_data = titles_data.merge(credits_data, how='outer', on='id')
 # Filtering Directors and Actors
 director = titles_data[titles_data['role'] == 'director']
 actor = titles_data[titles_data['role'] == 'actor']
+
+#Top 10 Directors
+top10_directors = director.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
+    ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
+print("Top 10 directors based on ratings:\n", top10_directors)
+
+top10_tmdb_rating.plot(kind='barh', x='name', y='tmdb_score', figsize=(9, 6), color='yellow') #Plot Horizontal Bargraph
+plt.title('Top 10 Directors')   # Title
+plt.xlabel('tmdb_popularity')  # X-axis label
+plt.ylabel('name')  # Y-axis label
+plt.show()
+
+top10_actors = actor.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
+    ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
+print("Top 10 actors based on ratings:\n", top10_actors)
+
+top10_tmdb_rating.plot(kind='barh', x='name', y='tmdb_score', figsize=(9, 6), color='violet') #Plot Horizontal Bargraph
+plt.title('Top 10 Actors')   # Title
+plt.xlabel('tmdb_popularity')  # X-axis label
+plt.ylabel('name')  # Y-axis label
+plt.show()
