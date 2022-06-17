@@ -155,16 +155,15 @@ print(modelling_titles_data.columns)
 # Data Split
 
 y = modelling_titles_data.tmdb_score
-
-modelling_titles_data['type_cat'] = modelling_titles_data.type.cat.codes
-modelling_titles_data['genres_cat'] = modelling_titles_data.genres.cat.codes
-modelling_titles_data['production_countries_cat'] = modelling_titles_data.production_countries.cat.codes
-
-print(modelling_titles_data.columns)
-
-features = ['type_cat', 'release_year', 'runtime', 'genres_cat',
-            'production_countries_cat', 'imdb_score', 'tmdb_popularity']
+features = ['type', 'release_year', 'runtime', 'genres',
+            'production_countries', 'imdb_score', 'tmdb_popularity']
 X = modelling_titles_data[features]
+
+X['type'] = X['type'].astype('category')
+X['genres'] = X['genres'].astype('category')
+X['production_countries'] = X['production_countries'].astype('category')
+
+print(X.info())
 
 # Train-Test Split
 
