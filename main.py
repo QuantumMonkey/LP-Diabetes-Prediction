@@ -31,6 +31,8 @@ titles_data.dropna(axis=0, how='any', inplace=True)
 print("Null values in columns:\n", titles_data.isnull().sum(), '\n')  # Display number of null values in columns
 print("Dimensions: ", titles_data.shape, '\n')  # Data Structure
 
+modelling_titles_data = titles_data  # Backup if the merged data doesn't work out
+
 # Credits
 print("Top 5 rows:\n", credits_data.head(), '\n')  # Display top 5 rows
 print("Dimensions: ", credits_data.shape, '\n')  # Data Structure
@@ -64,7 +66,7 @@ plt.show()
 year_count = titles_data.release_year.value_counts()
 print("Content produced in the last 10 years:\n", year_count.head(10))
 
-sns.lineplot(data=year_count)  # Feed data to seaborn graph
+sns.lineplot(data=year_count)  # Feed data to seaborn line graph
 plt.title('Total shows/movies released over the years')  # Title
 plt.xlim(1950, 2030)  # Limit range for X-axis
 plt.xlabel('release year')  # X-axis label
@@ -83,10 +85,11 @@ plt.show()
 
 top10_tmdb_rating = titles_data.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
     ['title', 'tmdb_score', 'tmdb_popularity', 'type']].head(10)
-plt.title('Top 10 based on tmdb votes')
 print("Top 10 movies/shows based on ratings:\n", top10_tmdb_rating)
 
-top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_popularity', figsize=(9, 6), color='green') #Plot Horizontal Bargraph
+top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_popularity', figsize=(9, 6),
+                       color='green')  # Plot Horizontal Bar graph
+plt.title('Top 10 based on tmdb votes')
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('Title')  # Y-axis label
 plt.show()
@@ -95,26 +98,60 @@ plt.show()
 titles_data = titles_data.merge(credits_data, how='outer', on='id')
 
 # Filtering Directors and Actors
-director = titles_data[titles_data['role'] == 'director']
-actor = titles_data[titles_data['role'] == 'actor']
+director = titles_data[titles_data['role'] == 'DIRECTOR']
+actor = titles_data[titles_data['role'] == 'ACTOR']
 
-#Top 10 Directors
+# Top 10 Directors
 top10_directors = director.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
     ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
 print("Top 10 directors based on ratings:\n", top10_directors)
 
-top10_tmdb_rating.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6), color='yellow') #Plot Horizontal Bargraph
-plt.title('Top 10 Directors')   # Title
+top10_directors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
+                     color='yellow')  # Plot Horizontal Bar graph
+plt.title("Top 10 Directors based on tmdb popularity")  # Title
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('name')  # Y-axis label
 plt.show()
 
+# Top 10 Actors
 top10_actors = actor.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
     ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
 print("Top 10 actors based on ratings:\n", top10_actors)
 
-top10_tmdb_rating.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6), color='violet') #Plot Horizontal Bargraph
-plt.title('Top 10 Actors')   # Title
+top10_actors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
+                  color='violet')  # Plot Horizontal Bar graph
+plt.title("Top 10 Actors based on tmdb popularity")  # Title
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('name')  # Y-axis label
 plt.show()
+
+"""
+Now that we know what our data does, let us try to predict tmdb scores based on our final and merged data.
+If that doesn't work, let us try to predict it on the cleaned titles_data. We will use Supervised Machine Learning
+"""
+
+# Merged Dataset Cleaning
+
+print(titles_data.info())
+print("Null values in columns:\n", titles_data.isnull().sum(), '\n')  # Display number of null values in columns
+titles_data.dropna(axis=0, how='any', inplace=True)
+print("Null values in columns:\n", titles_data.isnull().sum(), '\n')  # Display number of null values in columns
+print("Dimensions: ", titles_data.shape, '\n')  # Data Structure
+
+# Data Split
+
+
+
+# Train-Test Split
+
+from sklearn.model_selection import train_test_split
+
+
+# Trial 1 - Linear Regression
+
+from sklearn.linear_model import LinearRegression as LR  # Model Specification
+from sklearn.model_selection import cross_val_score as CVS  # Choose correct Root Mean Square Deviation by automating an average calculation
+
+lr = LR()
+lr.fit()
+scores = CVS()
