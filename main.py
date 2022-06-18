@@ -179,21 +179,22 @@ X = X[factorized_features]
 X.info()  # X is now ready to use
 
 #Trial 1 - Decision Tree Regression
+# Train-Test Split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2)
+
+# Trial 1 - Decision Tree Regression
+
+tmdb_model = DecisionTreeRegressor()
+tmdb_model.fit(X_train, y_train)
+y_pred = tmdb_model.predict(X_test)
+print('\n', y_pred)
+
+
 """
 rmse_track = []
 for step in range(100): # looped 100 random states to find least rmse for usability
 #We found random_state 10 and 68 to be giving minimum RMSE of 1.08
-
-# Train-Test Split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2, random_state=step)
-
-# Trial 1 - Decision Tree Regression
-
-tmdb_model = DecisionTreeRegressor(random_state=step)
-tmdb_model.fit(X_train, y_train)
-predictions = tmdb_model.predict(X_test)
-print('\n', predictions)
 
 # Mean Squared Error
 from sklearn.metrics import mean_squared_error
@@ -211,22 +212,10 @@ for i in range(len(rmse_track)):
         print("Root Mean Squared Error(RMSE) values: ", min_rmse)
 """
 
-
-# Train-Test Split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2, random_state=step)
-
-# Trial 1 - Decision Tree Regression
-
-tmdb_model = DecisionTreeRegressor(random_state=step)
-tmdb_model.fit(X_train, y_train)
-predictions = tmdb_model.predict(X_test)
-print('\n', predictions)
-
 # calc average first then compare to mea to determine randomstate
 
 # Cross Validation Score
-scores = cross_val_score(tmdb_model, X, y, scoring='neg_mean_squared_error', cv=5, n_jobs=1)
+scores = cross_val_score(tmdb_model, X, y, scoring='neg_mean_squared_error', cv=200, n_jobs=-1)
 
 rmse = np.sqrt(-scores)
 print("\nRoot Mean Squared Error(RMSE) values: ", np.round(rmse, 2))
@@ -240,4 +229,8 @@ for i in range(len(rmse)):
         print("Root Mean Squared Error(RMSE) values: ", min_rmse)
 
 
-#Trial 2 -
+output = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 1)})
+output.to_csv('Decision Tree Output Comparison.csv', index=False)
+print("Your file was successfully saved!")
+
+#Trial 2 - Random Forest
