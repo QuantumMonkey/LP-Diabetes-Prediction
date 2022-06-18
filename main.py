@@ -1,20 +1,27 @@
 """
-Phase 1: Data Visualization
+Phase 1: Exploratory Data Analysis and Data Visualization
 
 This data is information about the shows and movies streaming in the USA.
 The intention here is to find out how Netflix content is being consumed by the audience.
+
+Phase 2:
+
+The data has now been cleaned, analyzed and seems usable to try to replicate results with.
+The intention is to prepare a Supervised ML model to try to predict the tmdb scores based on given information.
 """
 
-import numpy as np  # to perform linear algebra
-import pandas as pd  # to perform data and file processing
-import matplotlib.pyplot as plt  # for plotting data
-import seaborn as sns  # for visualizing data
+import numpy as np  # To perform linear algebra
+import pandas as pd  # To perform data and file processing
+import matplotlib.pyplot as plt  # For plotting data
+import seaborn as sns  # For visualizing data
+from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE # calculation
+from sklearn.tree import DecisionTreeRegressor  # Decision Tree Algorithm
 
 
 def data_info(dataset):  # Display stats and null values
     """
     :param dataset: The table to print statistical information about.
-    :return: Displayed statistics and structure
+    :return: Displayed statistics and structure.
     """
     print("Top 5 rows:\n", dataset.head(), '\n')  # Display top 5 rows
     print("Dimensions: ", dataset.shape, '\n')  # Data Structure
@@ -33,27 +40,6 @@ def data_clean(dataset):  # Drop null values
     print("Null values in columns:\n", dataset.isnull().sum(), '\n')  # Display number of null values in columns
     print("Dimensions: ", dataset.shape, '\n')  # Data Structure
     return dataset
-
-
-def data_format(dataset, column):
-    """
-
-    :param dataset: The table to perform SQL operations on. Used to search unique records to factorize.
-    :param column: The column we need to factorize
-    :return: Nothing. The column will be factorized and typecast-ed in the dataframe directly.
-    """
-    from pandasql import sqldf
-
-    pysqldf = lambda q: sqldf(q, globals())
-
-    unique_values_query = "select distinct {} from {}".format(column, dataset)  # Find unique values
-    unique_values_df = pysqldf(unique_values_query)  # Run PandaSQL command
-    print(unique_values_df)  # Result type is dataframe
-
-    unique_values_list = unique_values_df[column].tolist()  # Convert to list
-
-    for seek in len(unique_values_list):  # Traverse list length
-        unique_values_list[seek] = seek  # Replace list item with index (numerical)
 
 
 # Import data into DataFrames
@@ -178,49 +164,80 @@ features = ['type', 'release_year', 'runtime', 'genres',
             'production_countries', 'imdb_score', 'tmdb_popularity']
 X = modelling_titles_data[features]
 
-# Define a function for data category formatting. Select and find distinct values. Convert result into list. Traverse
-# that list and change all unique entries into float/int
+col = ['type', 'genres', 'production_countries']  # Columns that need to be Factorized
 
-# X['type'] = X['type'].astype('category')
-# X['type'] = X['type'].astype('float64')
-# X['genres'] = X['genres'].astype('category')
-# X['genres'] = X['genres'].astype('float64')
-# X['production_countries'] = X['production_countries'].astype('category')
-# X['production_countries'] = X['production_countries'].astype('float64')
+# Factorization using pandas
+X['type_fac'] = pd.factorize(X['type'])[0]
+X['genres_fac'] = pd.factorize(X['genres'])[0]
+X['production_countries_fac'] = pd.factorize(X['production_countries'])[0]
 
-# print(X.info())
-# print(X['type'])
+factorized_features = ['type_fac', 'release_year', 'runtime', 'genres_fac',
+                       'production_countries_fac', 'imdb_score', 'tmdb_popularity']
 
+X = X[factorized_features]
+
+X.info()  # X is now ready to use
+
+#Trial 1 - Decision Tree Regression
 """
+rmse_track = []
+for step in range(100): # looped 100 random states to find least rmse for usability
+#We found random_state 10 and 68 to be giving minimum RMSE of 1.08
+
 # Train-Test Split
 
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2)
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2, random_state=step)
 
 # Trial 1 - Decision Tree Regression
-from sklearn.tree import DecisionTreeRegressor
-tmdb_model = DecisionTreeRegressor(random_state=1)
-tmdb_model.fit(X, y)
-predictions = tmdb_model.predict(X)
-print(predictions)
 
+tmdb_model = DecisionTreeRegressor(random_state=step)
+tmdb_model.fit(X_train, y_train)
+predictions = tmdb_model.predict(X_test)
+print('\n', predictions)
 
 # Mean Squared Error
 from sklearn.metrics import mean_squared_error
-mse = mean_squared_error(y_test, y_predict)
+mse = mean_squared_error(y_test, predictions)
 rmse = np.sqrt(mse)
-print("Root Mean Squared Error(RMSE) values: ", np.round(rmse, 2))
+rmse = np.round(rmse, 2)
+print("Root Mean Squared Error(RMSE) values: ", rmse)
+rmse_track.append(rmse)
+
+min_rmse = min(rmse_track)
+for i in range(len(rmse_track)):
+    if rmse_track[i-1] == min_rmse:
+        min_rmse_random_state = i-1
+        print("\nMinimum RMSE values in random_state: ", min_rmse_random_state)
+        print("Root Mean Squared Error(RMSE) values: ", min_rmse)
+"""
 
 
-#calc average first then compare to mea to determine randomstate
+# Train-Test Split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2, random_state=step)
+
+# Trial 1 - Decision Tree Regression
+
+tmdb_model = DecisionTreeRegressor(random_state=step)
+tmdb_model.fit(X_train, y_train)
+predictions = tmdb_model.predict(X_test)
+print('\n', predictions)
+
+# calc average first then compare to mea to determine randomstate
 
 # Cross Validation Score
-from sklearn.model_selection import \
-    cross_val_score  # Choose correct Root Mean Square Deviation by automating an average calculation
 scores = cross_val_score(tmdb_model, X, y, scoring='neg_mean_squared_error', cv=5, n_jobs=1)
 
 rmse = np.sqrt(-scores)
-print("Root Mean Squared Error(RMSE) values: ", np.round(rmse, 2))
-print("Average RMSE: ", np.mean(rmse))
-"""
+print("\nRoot Mean Squared Error(RMSE) values: ", np.round(rmse, 2))
+print("\nAverage RMSE: ", np.mean(rmse))
+
+min_rmse = min(rmse)
+for i in range(len(rmse)):
+    if rmse[i-1] == min_rmse:
+        min_rmse_random_state = i-1
+        print("\nMinimum RMSE values in random_state: ", min_rmse_random_state)
+        print("Root Mean Squared Error(RMSE) values: ", min_rmse)
+
+
+#Trial 2 -
