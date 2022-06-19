@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt  # For plotting data
 import seaborn as sns  # For visualizing data
 from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE # calculation
 from sklearn.tree import DecisionTreeRegressor  # Decision Tree Algorithm
+from scipy.stats import norm  # For statistical functions
 
 
 def data_info(dataset):  # Display stats and null values
@@ -86,9 +87,82 @@ X = modelling_titles_data[features]
 X.info()  # X is now ready to use
 
 # Gaussian plot
+# Find mean and standard deviation
+type_fac_mean = np.mean(X['type_fac'])
+release_year_mean = np.mean(X['release_year'])
+runtime_mean = np.mean(X['runtime'])
+genres_fac_mean = np.mean(X['genres_fac'])
+prod_ctry_mean = np.mean(X['production_countries_fac'])
+imdb_mean = np.mean(X['imdb_score'])
+
+type_fac_std = np.std(X['type_fac'])
+release_year_std = np.std(X['release_year'])
+runtime_std = np.std(X['runtime'])
+genres_fac_std = np.std(X['genres_fac'])
+prod_ctry_std = np.std(X['production_countries_fac'])
+imdb_std = np.std(X['imdb_score'])
+
+# Drawing Probability Density Function (pdf)
+type_fac_pdf = norm.pdf(X['type_fac'].sort_values(), type_fac_mean, type_fac_std)
+release_year_pdf = norm.pdf(X['release_year'].sort_values(), release_year_mean, release_year_std)
+runtime_pdf = norm.pdf(X['runtime'].sort_values(), runtime_mean, runtime_std)
+genres_fac_pdf = norm.pdf(X['genres_fac'].sort_values(), genres_fac_mean, genres_fac_std)
+prod_ctry_pdf = norm.pdf(X['production_countries_fac'].sort_values(), prod_ctry_mean, prod_ctry_std)
+imdb_pdf = norm.pdf(X['imdb_score'].sort_values(), imdb_mean, imdb_std)
+
+# Plot normal distributions for all independent variables
+# type_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['type_fac']), np.max(X['type_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['type_fac'].sort_values(), type_fac_pdf)
+# plt.show()
+
+# release_year
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['release_year']), np.max(X['release_year']))
+plt.xlabel("Factorized Type")
+plt.plot(X['release_year'].sort_values(), release_year_pdf)
+# plt.show()
+
+# runtime
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['runtime']), np.max(X['runtime']))
+plt.xlabel("Factorized Type")
+plt.plot(X['runtime'].sort_values(), runtime_pdf)
+# plt.show()
+
+# genres_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['genres_fac']), np.max(X['genres_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['genres_fac'].sort_values(), genres_fac_pdf)
+# plt.show()
+
+# production_countries_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['production_countries_fac']), np.max(X['production_countries_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['production_countries_fac'].sort_values(), prod_ctry_pdf)
+# plt.show()
+
+# imdb_score
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['imdb_score']), np.max(X['imdb_score']))
+plt.xlabel("Factorized Type")
+plt.plot(X['imdb_score'].sort_values(), imdb_pdf)
+# plt.show()
+
+# Normalization
 
 
-# Trial 1 - Decision Tree Regression
+"""# Trial 1 - Decision Tree Regression
 # Train-Test Split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2)
@@ -98,7 +172,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_siz
 tmdb_model = DecisionTreeRegressor()
 tmdb_model.fit(X_train, y_train)
 y_pred = tmdb_model.predict(X_test)
-print('\n', y_pred)
+print('\n', y_pred)"""
 
 """
 rmse_track = []
@@ -138,7 +212,7 @@ for i in range(len(rmse)):
         print("Root Mean Squared Error(RMSE) values: ", min_rmse)
 """
 
-# Mean Squared Error
+"""# Mean Squared Error
 from sklearn.metrics import mean_squared_error
 
 mse = mean_squared_error(y_test, y_pred)
@@ -151,3 +225,4 @@ output.to_csv('Decision Tree Output Comparison.csv', index=False)
 print("Your file was successfully saved!")
 
 # Trial 2 - Random Forest
+"""

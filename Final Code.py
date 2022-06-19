@@ -11,8 +11,9 @@ import matplotlib.pyplot as plt  # For plotting data
 import seaborn as sns  # For visualizing data
 from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE # calculation
 from sklearn.tree import DecisionTreeRegressor  # Decision Tree Algorithm
+from scipy.stats import norm  # For statistical functions
 
-# Methods
+
 def data_info(dataset):  # Display stats and null values
     """
     :param dataset: The table to print statistical information about.
@@ -69,7 +70,7 @@ top10_production_countries.plot(kind='bar', width=0.8, figsize=(9, 6), color='r'
 plt.title('Top 10 countries with highest production')  # Title
 plt.xlabel('Countries')  # X-axis label
 plt.ylabel('Production Count')  # Y-axis label
-# plt.show()
+plt.show()
 
 # Content production per year
 year_count = titles_data.release_year.value_counts()
@@ -80,7 +81,7 @@ plt.title('Total shows/movies released over the years')  # Title
 plt.xlim(1950, 2030)  # Limit range for X-axis
 plt.xlabel('release year')  # X-axis label
 plt.ylabel('total')  # Y-axis label
-# plt.show()
+plt.show()
 
 # Types of content on Netflix
 type_count = titles_data.type.value_counts()
@@ -88,7 +89,7 @@ print("\nTypes of content with count:\n", type_count.head())
 
 type_count.plot(kind='pie', figsize=(10, 5), autopct='%1.1f%%')  # Plot Pie Chart
 plt.title('Type Distribution')  # Title
-# plt.show()
+plt.show()
 
 # Highly voted content
 
@@ -101,7 +102,7 @@ top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_popularity', figsize=(9, 
 plt.title('Top 10 based on tmdb votes')
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('Title')  # Y-axis label
-# plt.show()
+plt.show()
 
 # Merging data for top actors and directors
 titles_data = titles_data.merge(credits_data, how='outer', on='id')
@@ -120,7 +121,7 @@ top10_directors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
 plt.title("Top 10 Directors based on tmdb popularity")  # Title
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('name')  # Y-axis label
-# plt.show()
+plt.show()
 
 # Top 10 Actors
 top10_actors = actor.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
@@ -132,7 +133,7 @@ top10_actors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
 plt.title("Top 10 Actors based on tmdb popularity")  # Title
 plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('name')  # Y-axis label
-# plt.show()
+plt.show()
 
 # Factorize text columns
 modelling_titles_data['type_fac'] = pd.factorize(modelling_titles_data['type'])[0]
@@ -148,7 +149,77 @@ X = modelling_titles_data[features]
 X.info()  # X is now ready to use in regression algorithms
 
 # Gaussian plotting
+# Find mean and standard deviation
+type_fac_mean = np.mean(X['type_fac'])
+release_year_mean = np.mean(X['release_year'])
+runtime_mean = np.mean(X['runtime'])
+genres_fac_mean = np.mean(X['genres_fac'])
+prod_ctry_mean = np.mean(X['production_countries_fac'])
+imdb_mean = np.mean(X['imdb_score'])
 
+type_fac_std = np.std(X['type_fac'])
+release_year_std = np.std(X['release_year'])
+runtime_std = np.std(X['runtime'])
+genres_fac_std = np.std(X['genres_fac'])
+prod_ctry_std = np.std(X['production_countries_fac'])
+imdb_std = np.std(X['imdb_score'])
+
+# Drawing Probability Density Function (pdf)
+type_fac_pdf = norm.pdf(X['type_fac'].sort_values(), type_fac_mean, type_fac_std)
+release_year_pdf = norm.pdf(X['release_year'].sort_values(), release_year_mean, release_year_std)
+runtime_pdf = norm.pdf(X['runtime'].sort_values(), runtime_mean, runtime_std)
+genres_fac_pdf = norm.pdf(X['genres_fac'].sort_values(), genres_fac_mean, genres_fac_std)
+prod_ctry_pdf = norm.pdf(X['production_countries_fac'].sort_values(), prod_ctry_mean, prod_ctry_std)
+imdb_pdf = norm.pdf(X['imdb_score'].sort_values(), imdb_mean, imdb_std)
+
+# Plot normal distributions for all independent variables
+# type_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['type_fac']), np.max(X['type_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['type_fac'].sort_values(), type_fac_pdf)
+plt.show()
+
+# release_year
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['release_year']), np.max(X['release_year']))
+plt.xlabel("Factorized Type")
+plt.plot(X['release_year'].sort_values(), release_year_pdf)
+plt.show()
+
+# runtime
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['runtime']), np.max(X['runtime']))
+plt.xlabel("Factorized Type")
+plt.plot(X['runtime'].sort_values(), runtime_pdf)
+plt.show()
+
+# genres_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['genres_fac']), np.max(X['genres_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['genres_fac'].sort_values(), genres_fac_pdf)
+plt.show()
+
+# production_countries_fac
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['production_countries_fac']), np.max(X['production_countries_fac']))
+plt.xlabel("Factorized Type")
+plt.plot(X['production_countries_fac'].sort_values(), prod_ctry_pdf)
+plt.show()
+
+# imdb_score
+plt.figure(figsize=(4, 1), dpi=80)
+plt.tight_layout()
+plt.xlim(np.min(X['imdb_score']), np.max(X['imdb_score']))
+plt.xlabel("Factorized Type")
+plt.plot(X['imdb_score'].sort_values(), imdb_pdf)
+plt.show()
 
 # Standardization/Normalization
 # Final cleaning on data
