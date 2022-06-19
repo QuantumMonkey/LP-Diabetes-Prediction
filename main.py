@@ -68,117 +68,27 @@ print("Top 5 rows:\n", credits_data.head(), '\n')  # Display top 5 rows
 data_clean(credits_data)
 
 """
-Exploratory Data Analysis - time to plot some insights
-"""
-
-# Top 10 Countries to produce content
-top10_production_countries = titles_data.production_countries.value_counts().head(10)
-
-top10_production_countries.plot(kind='bar', width=0.8, figsize=(9, 6), color='r')  # plot a bar graph
-plt.title('Top 10 countries with highest production')  # Title
-plt.xlabel('Countries')  # X-axis label
-plt.ylabel('Production Count')  # Y-axis label
-# plt.show()
-
-# Content production per year
-year_count = titles_data.release_year.value_counts()
-print("Content produced in the last 10 years:\n", year_count.head(10))
-
-sns.lineplot(data=year_count)  # Feed data to seaborn line graph
-plt.title('Total shows/movies released over the years')  # Title
-plt.xlim(1950, 2030)  # Limit range for X-axis
-plt.xlabel('release year')  # X-axis label
-plt.ylabel('total')  # Y-axis label
-# plt.show()
-
-# Types of content on Netflix
-type_count = titles_data.type.value_counts()
-print("\nTypes of content with count:\n", type_count.head())
-
-type_count.plot(kind='pie', figsize=(10, 5), autopct='%1.1f%%')  # Plot Pie Chart
-plt.title('Type Distribution')  # Title
-# plt.show()
-
-# Highly voted content
-
-top10_tmdb_rating = titles_data.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
-    ['title', 'tmdb_score', 'tmdb_popularity', 'type']].head(10)
-print("Top 10 movies/shows based on ratings:\n", top10_tmdb_rating)
-
-top10_tmdb_rating.plot(kind='barh', x='title', y='tmdb_popularity', figsize=(9, 6),
-                       color='green')  # Plot Horizontal Bar graph
-plt.title('Top 10 based on tmdb votes')
-plt.xlabel('tmdb_popularity')  # X-axis label
-plt.ylabel('Title')  # Y-axis label
-# plt.show()
-
-# Merging data for top actors and directors
-titles_data = titles_data.merge(credits_data, how='outer', on='id')
-
-# Filtering Directors and Actors
-director = titles_data[titles_data['role'] == 'DIRECTOR']
-actor = titles_data[titles_data['role'] == 'ACTOR']
-
-# Top 10 Directors
-top10_directors = director.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
-    ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
-print("Top 10 directors based on ratings:\n", top10_directors)
-
-top10_directors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
-                     color='yellow')  # Plot Horizontal Bar graph
-plt.title("Top 10 Directors based on tmdb popularity")  # Title
-plt.xlabel('tmdb_popularity')  # X-axis label
-plt.ylabel('name')  # Y-axis label
-# plt.show()
-
-# Top 10 Actors
-top10_actors = actor.sort_values(['tmdb_score', 'tmdb_popularity'], ascending=False)[
-    ['name', 'tmdb_score', 'tmdb_popularity']].head(10)
-print("Top 10 actors based on ratings:\n", top10_actors)
-
-top10_actors.plot(kind='barh', x='name', y='tmdb_popularity', figsize=(9, 6),
-                  color='violet')  # Plot Horizontal Bar graph
-plt.title("Top 10 Actors based on tmdb popularity")  # Title
-plt.xlabel('tmdb_popularity')  # X-axis label
-plt.ylabel('name')  # Y-axis label
-# plt.show()
-
-"""
 Now that we know what our data does, let us try to predict tmdb scores based on our final and merged data.
-If that doesn't work, let us try to predict it on the cleaned titles_data. We will use Supervised Machine Learning
+If that doesn't work, let us try to predict it on the cleaned titles_data. We will use Supervised Machine Learning.
 """
 
-# Merged Dataset Cleaning
-
-print(modelling_titles_data.info())
-print("Null values in columns:\n", modelling_titles_data.isnull().sum(),
-      '\n')  # Display number of null values in columns
-print("Dimensions: ", modelling_titles_data.shape, '\n')  # Data Structure
-
-print(modelling_titles_data.columns)
-
+# Factorization using pandas
+modelling_titles_data['type_fac'] = pd.factorize(modelling_titles_data['type'])[0]
+modelling_titles_data['genres_fac'] = pd.factorize(modelling_titles_data['genres'])[0]
+modelling_titles_data['production_countries_fac'] = pd.factorize(modelling_titles_data['production_countries'])[0]
 # Data Split
 
 y = modelling_titles_data.tmdb_score
-features = ['type', 'release_year', 'runtime', 'genres',
-            'production_countries', 'imdb_score', 'tmdb_popularity']
+features = ['type_fac', 'release_year', 'runtime', 'genres_fac',
+            'production_countries_fac', 'imdb_score']
 X = modelling_titles_data[features]
-
-col = ['type', 'genres', 'production_countries']  # Columns that need to be Factorized
-
-# Factorization using pandas
-X['type_fac'] = pd.factorize(X['type'])[0]
-X['genres_fac'] = pd.factorize(X['genres'])[0]
-X['production_countries_fac'] = pd.factorize(X['production_countries'])[0]
-
-factorized_features = ['type_fac', 'release_year', 'runtime', 'genres_fac',
-                       'production_countries_fac', 'imdb_score']
-
-X = X[factorized_features]
 
 X.info()  # X is now ready to use
 
-#Trial 1 - Decision Tree Regression
+# Gaussian plot
+
+
+# Trial 1 - Decision Tree Regression
 # Train-Test Split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2)
@@ -189,7 +99,6 @@ tmdb_model = DecisionTreeRegressor()
 tmdb_model.fit(X_train, y_train)
 y_pred = tmdb_model.predict(X_test)
 print('\n', y_pred)
-
 
 """
 rmse_track = []
@@ -231,14 +140,14 @@ for i in range(len(rmse)):
 
 # Mean Squared Error
 from sklearn.metrics import mean_squared_error
+
 mse = mean_squared_error(y_test, y_pred)
 rmse = np.sqrt(mse)
 rmse = np.round(rmse, 2)
 print("Root Mean Squared Error(RMSE) values: ", rmse)
 
-
 output = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 1)})
 output.to_csv('Decision Tree Output Comparison.csv', index=False)
 print("Your file was successfully saved!")
 
-#Trial 2 - Random Forest
+# Trial 2 - Random Forest

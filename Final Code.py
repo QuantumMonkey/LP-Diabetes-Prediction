@@ -134,8 +134,22 @@ plt.xlabel('tmdb_popularity')  # X-axis label
 plt.ylabel('name')  # Y-axis label
 # plt.show()
 
+# Factorize text columns
+modelling_titles_data['type_fac'] = pd.factorize(modelling_titles_data['type'])[0]
+modelling_titles_data['genres_fac'] = pd.factorize(modelling_titles_data['genres'])[0]
+modelling_titles_data['production_countries_fac'] = pd.factorize(modelling_titles_data['production_countries'])[0]
+# Data Split
+
+y = modelling_titles_data.tmdb_score
+features = ['type_fac', 'release_year', 'runtime', 'genres_fac',
+            'production_countries_fac', 'imdb_score']
+X = modelling_titles_data[features]
+
+X.info()  # X is now ready to use in regression algorithms
 
 # Gaussian plotting
+
+
 # Standardization/Normalization
 # Final cleaning on data
 # Create training and testing data
