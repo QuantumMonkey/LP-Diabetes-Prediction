@@ -172,7 +172,7 @@ X['genres_fac'] = pd.factorize(X['genres'])[0]
 X['production_countries_fac'] = pd.factorize(X['production_countries'])[0]
 
 factorized_features = ['type_fac', 'release_year', 'runtime', 'genres_fac',
-                       'production_countries_fac', 'imdb_score', 'tmdb_popularity']
+                       'production_countries_fac', 'imdb_score']
 
 X = X[factorized_features]
 
@@ -210,7 +210,7 @@ for i in range(len(rmse_track)):
         min_rmse_random_state = i-1
         print("\nMinimum RMSE values in random_state: ", min_rmse_random_state)
         print("Root Mean Squared Error(RMSE) values: ", min_rmse)
-"""
+
 
 # calc average first then compare to mea to determine randomstate
 
@@ -227,6 +227,14 @@ for i in range(len(rmse)):
         min_rmse_random_state = i-1
         print("\nMinimum RMSE values in random_state: ", min_rmse_random_state)
         print("Root Mean Squared Error(RMSE) values: ", min_rmse)
+"""
+
+# Mean Squared Error
+from sklearn.metrics import mean_squared_error
+mse = mean_squared_error(y_test, y_pred)
+rmse = np.sqrt(mse)
+rmse = np.round(rmse, 2)
+print("Root Mean Squared Error(RMSE) values: ", rmse)
 
 
 output = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(y_pred, 1)})
