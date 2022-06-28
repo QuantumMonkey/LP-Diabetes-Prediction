@@ -9,9 +9,11 @@ import numpy as np  # To perform linear algebra
 import pandas as pd  # To perform data and file processing
 import matplotlib.pyplot as plt  # For plotting data
 import seaborn as sns  # For visualizing data
-from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE # calculation
+from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE calculation
 from sklearn.tree import DecisionTreeRegressor  # Decision Tree Algorithm
 from scipy.stats import norm  # For statistical functions
+from sklearn.metrics import mean_squared_error, mean_absolute_error  # For checking accuracy of models
+from sklearn.ensemble import RandomForestRegressor  # Random Forest Algorithm
 
 
 def data_info(dataset):  # Display stats and null values
@@ -221,10 +223,45 @@ plt.xlabel("Factorized Type")
 plt.plot(X['imdb_score'].sort_values(), imdb_pdf)
 plt.show()
 
-# Standardization/Normalization
-# Final cleaning on data
-# Create training and testing data
-# Build 3 models to determine most accurate with root-mean-square error
-# Create output files for each model
+# Train-Test Split
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, shuffle=True, test_size=0.2)
+
+# Trial 1 - Decision Tree Regression
+
+tmdb_model = DecisionTreeRegressor()
+tmdb_model.fit(X_train, y_train)
+DTy_pred = tmdb_model.predict(X_test)
+print('\n', DTy_pred)
+
+# Mean Squared Error
+
+mse = mean_squared_error(y_test, DTy_pred)
+rmse = np.sqrt(mse)
+rmse = np.round(rmse, 2)
+print("Root Mean Squared Error(RMSE) values in Decision Tree Model: ", rmse)
+
+# Cross Validation Score
+scores = cross_val_score(tmdb_model, X, y, scoring='neg_mean_squared_error', cv=200, n_jobs=-1)
+
+rmse = np.sqrt(-scores)
+rmse = np.mean(rmse)
+print("\nAverage RMSE using cross_val_score in Decision Tree Model: ", np.round(rmse, 2))
+
+outputDT = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(DTy_pred, 1)})
+"""outputDT.to_csv('Decision Tree Output Comparison.csv', index=False)
+print("Your file was successfully saved!")"""
+
+# Trial 2 - Random Forest Regression
+
+forest_model = RandomForestRegressor()
+forest_model.fit(X_train, y_train)
+RFy_pred = forest_model.predict(X_test)
+print("The mean absolute error in Random Forest model is: ", mean_absolute_error(y_test, RFy_pred))
+
+outputRF = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(RFy_pred, 1)})
+"""outputRF.to_csv('Random Forest Output Comparison.csv', index=False)
+print("Your RF file was successfully saved!")"""
+
 # Interpret results with more plots
 # Finish report and attach here
