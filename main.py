@@ -16,7 +16,6 @@ import matplotlib.pyplot as plt  # For plotting data
 import seaborn as sns  # For visualizing data
 from sklearn.model_selection import train_test_split, cross_val_score  # Train Test Split and Average RMSE calculation
 from sklearn.tree import DecisionTreeRegressor  # Decision Tree Algorithm
-from scipy.stats import norm  # For statistical functions
 from sklearn.metrics import mean_squared_error, mean_absolute_error  # For checking accuracy of models
 from sklearn.ensemble import RandomForestRegressor  # Random Forest Algorithm
 
@@ -132,16 +131,21 @@ outputRF = pd.DataFrame({'y_test': y_test, 'y_pred': np.round(RFy_pred, 1)})
 """outputRF.to_csv('Random Forest Output Comparison.csv', index=False)
 print("Your RF file was successfully saved!")"""
 
-# Plotting Random Forest findings
+# Plotting error findings
 
-# Content production per year
-actual_valRF = outputRF.y_test
-predicted_valRF = outputRF.y_pred
-
-sns.lineplot(data=actual_valRF)  # Feed data to seaborn line graph
-plt.title('Total shows/movies released over the years')  # Title
-plt.xlabel('release year')  # X-axis label
-plt.ylabel('total')  # Y-axis label
+# Error in Decision Tree Model
+errorDT = outputDT.y_test - outputDT.y_pred
+sns.lineplot(data=errorDT)  # Feed data to seaborn line graph
+plt.title('Error in Decision Tree Model')  # Title
+plt.xlabel('Actual values - Predicted values')  # X-axis label
+plt.ylabel('Absolute Error')  # Y-axis label
 plt.show()
 
-#outputRF
+# Error in Random Forest Model
+errorRF = outputRF.y_test - outputRF.y_pred
+sns.lineplot(data=errorRF)  # Feed data to seaborn line graph
+plt.title('Error in Random Forest Model')  # Title
+plt.xlabel('Actual values - Predicted values')  # X-axis label
+plt.ylabel('Absolute Error')  # Y-axis label
+plt.show()
+
