@@ -1,3 +1,3 @@
-# PGA-Capstone-1
-Project made for Imarticus PGA Credit
+# Diabetes Prediction
+Learning Project from Kaggle dataset
 
